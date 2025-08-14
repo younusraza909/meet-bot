@@ -1,4 +1,5 @@
 // import { prisma } from "@/lib/db";
+import { prisma } from "@/lib/db";
 import { WebhookEvent } from "@clerk/nextjs/server";
 import { NextRequest, NextResponse } from "next/server";
 import { Webhook } from 'svix'
@@ -30,14 +31,14 @@ export async function POST(request: NextRequest) {
             const { id, email_addresses,first_name,last_name } = event.data
             const primaryEmail = email_addresses.find(email=>email.id===event.data.primary_email_address_id)?.email_address
 
-            // const newUser = await prisma.user.create({
-            //     data: {
-            //         id: id,
-            //         clerkId: id,
-            //         email: primaryEmail || null,
-            //         name: `${first_name} ${last_name}`
-            //     }
-            // })
+            const newUser = await prisma.user.create({
+                data: {
+                    id: id,
+                    clerkId: id,
+                    email: primaryEmail || null,
+                    name: `${first_name} ${last_name}`
+                }
+            })
             return NextResponse.json({ message: "user created successfully" })
         }
 
