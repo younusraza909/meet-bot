@@ -25,12 +25,19 @@ export async function POST(request: NextRequest) {
 
         const event = JSON.parse(payload) as WebhookEvent
         console.log('clerk webhook received', event.type)
-        console.log('Event Data', event.data)
 
         if (event.type === "user.created") {
-            const { id, email_addresses,first_name,last_name } = event.data
-            const primaryEmail = email_addresses.find(email=>email.id===event.data.primary_email_address_id)?.email_address
+            const { id, email_addresses, first_name, last_name } = event.data
+            const primaryEmail = email_addresses.find(email => email.id === event.data.primary_email_address_id)?.email_address
 
+            // Check if user already exists because if someone hit this webhook on his own from clerk again it would throw an error
+            const existingUser = await prisma.user.findUnique({
+                where: { id: id }
+            })
+
+            if (existingUser) {
+                return NextResponse.json({ message: "user already exists" })
+            }
             const newUser = await prisma.user.create({
                 data: {
                     id: id,
