@@ -5,6 +5,8 @@ import {
   ClerkProvider,
 } from '@clerk/nextjs'
 import { ThemeProvider } from "@/components/theme-provider";
+import { UsageContextProvider } from "./contexts/UsageContext";
+import { ConditionalLayout } from "./components/conditional-layout";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -28,9 +30,9 @@ export default function RootLayout({
 }>) {
   return (
     <ClerkProvider>
-    <html lang="en" suppressHydrationWarning>
+    <html lang="en" suppressHydrationWarning className="dark">
       <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased`}
+        className={`${geistSans.variable} ${geistMono.variable} antialiased bg-background text-foreground`}
       >
         <ThemeProvider
           attribute="class"
@@ -38,7 +40,9 @@ export default function RootLayout({
           enableSystem={false}
           disableTransitionOnChange
         >
-          {children}
+          <UsageContextProvider>
+            <ConditionalLayout>{children}</ConditionalLayout>
+          </UsageContextProvider>
         </ThemeProvider>
         </body>
       </html>
